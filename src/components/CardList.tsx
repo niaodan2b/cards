@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Plus } from 'lucide-react'
+import { Loader2, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { StarRating } from '@/components/StarRating'
@@ -11,12 +11,23 @@ type CardListProps = {
   cards: Card[]
   keyword: string
   selectedId: number | null
+  appVersion?: string
+  checkingUpdate?: boolean
   onSelect: (id: number) => void
   onCreate: () => void
   onSearch: (keyword: string) => void
 }
 
-export function CardList({ cards, keyword, selectedId, onSelect, onCreate, onSearch }: CardListProps) {
+export function CardList({
+  cards,
+  keyword,
+  selectedId,
+  appVersion,
+  checkingUpdate,
+  onSelect,
+  onCreate,
+  onSearch,
+}: CardListProps) {
   const [draft, setDraft] = useState(keyword)
 
   const submit = (e: FormEvent) => {
@@ -27,7 +38,13 @@ export function CardList({ cards, keyword, selectedId, onSelect, onCreate, onSea
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between border-b px-3 py-2">
-        <span className="text-sm font-medium">卡片</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm font-medium">卡片</span>
+          {appVersion ? (
+            <span className="text-[11px] tabular-nums leading-none text-muted-foreground">{appVersion}</span>
+          ) : null}
+          {checkingUpdate ? <Loader2 className="size-3 animate-spin text-muted-foreground" /> : null}
+        </div>
         <Button size="sm" onClick={onCreate}>
           <Plus />
           新增

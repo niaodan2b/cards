@@ -7,7 +7,11 @@
     "dev": "vite",
     "dev-app": "tauri dev",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "patch": "tauri-version patch --no-lock -m \"release v%s\" && git push --follow-tags",
+    "minor": "tauri-version minor --no-lock -m \"release v%s\" && git push --follow-tags",
+    "major": "tauri-version major --no-lock -m \"release v%s\" && git push --follow-tags"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -15,6 +19,8 @@
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-query": "^5.101.4",
     "@tauri-apps/api": "^2.11.1",
+    "@tauri-apps/plugin-process": "^2.3.1",
+    "@tauri-apps/plugin-updater": "^2.10.1",
     "@tiptap/markdown": "^3.30.2",
     "@tiptap/pm": "^3.30.2",
     "@tiptap/react": "^3.30.2",
@@ -37,6 +43,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.1.0",
+    "tauri-version": "^1.0.0",
     "typescript": "^7.0.2",
     "vite": "^8.2.2"
   }

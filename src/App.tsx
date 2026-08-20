@@ -1,11 +1,22 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import type { Update } from '@tauri-apps/plugin-updater'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { CardList } from '@/components/CardList'
 import { CardDetail } from '@/components/CardDetail'
 import { CreateCardDialog } from '@/components/CreateCardDialog'
 import { useCardList } from '@/hooks/useCards'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { checkAppUpdate, getAppVersion, installAppUpdate, isTauri } from '@/lib/updater'
 
 const queryClient = new QueryClient()
 
@@ -16,8 +27,39 @@ function CardsPage() {
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [pendingUpdate, setPendingUpdate] = useState<Update | null>(null)
+  const [updating, setUpdating] = useState(false)
+  const [appVersion, setAppVersion] = useState('')
+  const [checkingUpdate, setCheckingUpdate] = useState(isTauri)
 
   const selected = cards.find((card) => card.id === selectedId) ?? null
+
+  useEffect(() => {
+    let cancelled = false
+    void (async () => {
+      const version = await getAppVersion()
+      if (!cancelled) setAppVersion(version)
+      try {
+        const update = await checkAppUpdate()
+        if (!cancelled && update) setPendingUpdate(update)
+      } finally {
+        if (!cancelled) setCheckingUpdate(false)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const handleInstallUpdate = async () => {
+    if (!pendingUpdate) return
+    setUpdating(true)
+    try {
+      await installAppUpdate(pendingUpdate)
+    } catch {
+      setUpdating(false)
+    }
+  }
 
   const handleSelect = (id: number) => {
     setSelectedId(id)
@@ -43,6 +85,8 @@ function CardsPage() {
       cards={cards}
       keyword={keyword}
       selectedId={selectedId}
+      appVersion={appVersion}
+      checkingUpdate={checkingUpdate}
       onSelect={handleSelect}
       onCreate={() => setCreateOpen(true)}
       onSearch={setKeyword}
@@ -76,6 +120,30 @@ function CardsPage() {
         </>
       )}
       <CreateCardDialog open={createOpen} onOpenChange={setCreateOpen} onCreated={handleCreated} />
+
+      <AlertDialog
+        open={!!pendingUpdate}
+        onOpenChange={(open) => {
+          if (!open && !updating) setPendingUpdate(null)
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{pendingUpdate?.version}</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={updating}>取消</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={updating}
+              onClick={() => {
+                void handleInstallUpdate()
+              }}
+            >
+              {updating ? '…' : '更新'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
