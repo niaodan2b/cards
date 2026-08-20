@@ -31,7 +31,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  listCards: () => request<Card[]>('/cards/list'),
+  listCards: (q?: string) => {
+    const keyword = q?.trim()
+    const path = keyword ? `/cards/list?q=${encodeURIComponent(keyword)}` : '/cards/list'
+    return request<Card[]>(path)
+  },
   createCard: (payload: CreateCardPayload) =>
     request<number>('/cards/create', { method: 'POST', body: JSON.stringify(payload) }),
   updateCard: (payload: UpdateCardPayload) =>

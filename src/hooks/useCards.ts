@@ -3,8 +3,12 @@ import { api } from '@/lib/api'
 
 const CARDS_KEY = ['cards']
 
-export function useCardList() {
-  return useQuery({ queryKey: CARDS_KEY, queryFn: api.listCards })
+export function useCardList(q?: string) {
+  const keyword = q?.trim() ?? ''
+  return useQuery({
+    queryKey: [...CARDS_KEY, keyword],
+    queryFn: () => api.listCards(keyword),
+  })
 }
 
 export function useCreateCard() {

@@ -165,4 +165,7 @@
   .markdown-body .ProseMirror {
     @apply h-full min-h-40 outline-none;
   }
+  mark {
+    @apply rounded-sm bg-yellow-200 px-0.5 text-inherit dark:bg-yellow-800/80;
+  }
 }

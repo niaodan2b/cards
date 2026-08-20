@@ -17,16 +17,18 @@ import { StarRating } from '@/components/StarRating'
 import { MarkdownView } from '@/components/MarkdownView'
 import { MarkdownEditor } from '@/components/MarkdownEditor'
 import { useRemoveCard, useUpdateCard } from '@/hooks/useCards'
+import { highlightText } from '@/lib/highlight'
 import type { Card } from '@/lib/types'
 
 const TIME_FORMAT = 'YYYY-MM-DD HH:mm'
 
 type CardDetailProps = {
   card: Card
+  keyword?: string
   onDeleted: () => void
 }
 
-export function CardDetail({ card, onDeleted }: CardDetailProps) {
+export function CardDetail({ card, keyword = '', onDeleted }: CardDetailProps) {
   const [editing, setEditing] = useState(false)
   const [title, setTitle] = useState(card.title)
   const [level, setLevel] = useState(card.level)
@@ -107,7 +109,7 @@ export function CardDetail({ card, onDeleted }: CardDetailProps) {
     <div className="flex h-full flex-col">
       <div className="flex items-start justify-between gap-3 border-b px-4 py-3">
         <div className="flex min-w-0 flex-col gap-1.5">
-          <h2 className="truncate text-base font-medium">{card.title}</h2>
+          <h2 className="truncate text-base font-medium">{highlightText(card.title, keyword)}</h2>
           <StarRating value={card.level} />
         </div>
         <div className="flex shrink-0 gap-2">
@@ -122,7 +124,7 @@ export function CardDetail({ card, onDeleted }: CardDetailProps) {
         </div>
       </div>
       <div className="flex-1 overflow-y-auto px-4 py-3">
-        <MarkdownView content={card.content} />
+        <MarkdownView content={card.content} keyword={keyword} />
       </div>
       <div className="border-t px-4 py-2 text-xs text-muted-foreground">
         创建于 {dayjs(card.create_time).format(TIME_FORMAT)} · 更新于 {dayjs(card.update_time).format(TIME_FORMAT)}

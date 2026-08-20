@@ -11,7 +11,8 @@ const queryClient = new QueryClient()
 
 function CardsPage() {
   const isDesktop = useMediaQuery('(min-width: 1024px)')
-  const { data: cards = [] } = useCardList()
+  const [keyword, setKeyword] = useState('')
+  const { data: cards = [] } = useCardList(keyword)
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -40,9 +41,11 @@ function CardsPage() {
   const list = (
     <CardList
       cards={cards}
+      keyword={keyword}
       selectedId={selectedId}
       onSelect={handleSelect}
       onCreate={() => setCreateOpen(true)}
+      onSearch={setKeyword}
     />
   )
 
@@ -53,7 +56,7 @@ function CardsPage() {
           <aside className="w-72 shrink-0 border-r">{list}</aside>
           <main className="min-w-0 flex-1">
             {selected ? (
-              <CardDetail key={selected.id} card={selected} onDeleted={handleDeleted} />
+              <CardDetail key={selected.id} card={selected} keyword={keyword} onDeleted={handleDeleted} />
             ) : (
               <div className="flex h-full items-center justify-center text-sm text-muted-foreground/60">
                 未选中卡片
@@ -67,7 +70,7 @@ function CardsPage() {
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetContent side="right" className="gap-0 p-0 data-[side=right]:w-[85%] sm:max-w-md">
               <SheetTitle className="sr-only">卡片详情</SheetTitle>
-              {selected && <CardDetail key={selected.id} card={selected} onDeleted={handleDeleted} />}
+              {selected && <CardDetail key={selected.id} card={selected} keyword={keyword} onDeleted={handleDeleted} />}
             </SheetContent>
           </Sheet>
         </>
