@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import dayjs from 'dayjs'
 import { Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -14,7 +14,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { StarRating } from '@/components/StarRating'
-import { MarkdownView } from '@/components/MarkdownView'
 import { MarkdownEditor } from '@/components/MarkdownEditor'
 import { useRemoveCard, useUpdateCard } from '@/hooks/useCards'
 import { highlightText } from '@/lib/highlight'
@@ -36,15 +35,23 @@ export function CardDetail({ card, keyword = '', initialEditing = false, onDelet
   const [content, setContent] = useState(card.content)
   const [error, setError] = useState<string | null>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const draftRef = useRef({ title: card.title, level: card.level, content: card.content })
   const updateCard = useUpdateCard()
   const removeCard = useRemoveCard()
 
   const startEdit = () => {
-    setTitle(card.title)
-    setLevel(card.level)
-    setContent(card.content)
+    draftRef.current = { title, level, content }
     setError(null)
     setEditing(true)
+  }
+
+  const cancelEdit = () => {
+    const draft = draftRef.current
+    setTitle(draft.title)
+    setLevel(draft.level)
+    setContent(draft.content)
+    setError(null)
+    setEditing(false)
   }
 
   const save = async () => {
@@ -73,10 +80,10 @@ export function CardDetail({ card, keyword = '', initialEditing = false, onDelet
     }
   }
 
-  if (editing) {
-    return (
-      <div className="flex h-full flex-col">
-        <div className="flex items-center gap-3 border-b px-4 py-3">
+  return (
+    <div className="flex h-full min-h-0 flex-col overflow-hidden">
+      {editing ? (
+        <div className="flex shrink-0 items-center gap-3 border-b px-4 py-3">
           <Input
             value={title}
             onChange={(e) => {
@@ -87,13 +94,38 @@ export function CardDetail({ card, keyword = '', initialEditing = false, onDelet
           />
           <StarRating value={level} onChange={setLevel} />
         </div>
-        <div className="flex-1 overflow-y-auto px-4 py-3">
-          <MarkdownEditor initialContent={card.content} onChange={setContent} autoFocus />
+      ) : (
+        <div className="flex shrink-0 items-start justify-between gap-3 border-b px-4 py-3">
+          <div className="flex min-w-0 flex-col gap-1.5">
+            <h2 className="truncate text-base font-medium">{highlightText(title, keyword)}</h2>
+            <StarRating value={level} />
+          </div>
+          <div className="flex shrink-0 gap-2">
+            <Button variant="outline" size="sm" onClick={startEdit}>
+              <Pencil />
+              编辑
+            </Button>
+            <Button variant="destructive" size="sm" onClick={() => setConfirmOpen(true)}>
+              <Trash2 />
+              删除
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center justify-between gap-2 border-t px-4 py-2.5">
+      )}
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3" onDoubleClick={editing ? undefined : startEdit}>
+        <MarkdownEditor
+          content={content}
+          editable={editing}
+          keyword={editing ? '' : keyword}
+          autoFocus={editing}
+          onChange={setContent}
+        />
+      </div>
+      {editing ? (
+        <div className="flex shrink-0 items-center justify-between gap-2 border-t px-4 py-2.5">
           {error ? <p className="text-sm text-destructive">{error}</p> : <span />}
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => setEditing(false)}>
+            <Button variant="outline" size="sm" onClick={cancelEdit}>
               取消
             </Button>
             <Button size="sm" disabled={updateCard.isPending} onClick={() => void save()}>
@@ -101,42 +133,21 @@ export function CardDetail({ card, keyword = '', initialEditing = false, onDelet
             </Button>
           </div>
         </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="flex h-full flex-col">
-      <div className="flex items-start justify-between gap-3 border-b px-4 py-3">
-        <div className="flex min-w-0 flex-col gap-1.5">
-          <h2 className="truncate text-base font-medium">{highlightText(card.title, keyword)}</h2>
-          <StarRating value={card.level} />
-        </div>
-        <div className="flex shrink-0 gap-2">
-          <Button variant="outline" size="sm" onClick={startEdit}>
-            <Pencil />
-            编辑
-          </Button>
-          <Button variant="destructive" size="sm" onClick={() => setConfirmOpen(true)}>
-            <Trash2 />
-            删除
-          </Button>
-        </div>
-      </div>
-      <div className="flex-1 overflow-y-auto px-4 py-3" onDoubleClick={startEdit}>
-        <MarkdownView content={card.content} keyword={keyword} />
-      </div>
-      <div className="border-t px-4 py-2 text-xs text-muted-foreground">
-        创建于 {dayjs(card.create_time).format(TIME_FORMAT)} · 更新于 {dayjs(card.update_time).format(TIME_FORMAT)}
-      </div>
-      {error && <p className="border-t px-4 py-2 text-sm text-destructive">{error}</p>}
+      ) : (
+        <>
+          <div className="shrink-0 border-t px-4 py-2 text-xs text-muted-foreground">
+            创建于 {dayjs(card.create_time).format(TIME_FORMAT)} · 更新于 {dayjs(card.update_time).format(TIME_FORMAT)}
+          </div>
+          {error && <p className="border-t px-4 py-2 text-sm text-destructive">{error}</p>}
+        </>
+      )}
 
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent size="sm">
           <AlertDialogHeader>
             <AlertDialogTitle>删除卡片</AlertDialogTitle>
             <AlertDialogDescription>
-              确定删除「{card.title}」？此操作不可恢复。
+              确定删除「{title}」？此操作不可恢复。
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

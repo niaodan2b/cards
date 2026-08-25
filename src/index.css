@@ -121,11 +121,12 @@
   * {
     @apply border-border outline-ring/50;
     }
-  body {
-    @apply bg-background text-foreground;
-    }
   html {
-    @apply font-sans;
+    @apply h-full font-sans;
+    }
+  body,
+  #root {
+    @apply h-full overflow-hidden bg-background text-foreground;
     }
 }
 
@@ -135,7 +136,7 @@
 }
 
 @layer components {
-  /* Markdown 正文排版（查看态 react-markdown 与编辑态 TipTap 共用） */
+  /* Markdown 正文排版 */
   .markdown-body {
     @apply outline-none;
   }
@@ -164,12 +165,14 @@
     @apply font-semibold;
     color: #BF3F36;
   }
-  .markdown-body > :first-child,
   .markdown-body .ProseMirror > :first-child {
     @apply mt-0;
   }
   .markdown-body .ProseMirror {
-    @apply h-full min-h-40 outline-none;
+    @apply h-full outline-none;
+  }
+  .markdown-body.is-editable .ProseMirror {
+    @apply min-h-40;
   }
   mark {
     @apply rounded-sm bg-yellow-200 px-0.5 text-inherit dark:bg-yellow-800/80;

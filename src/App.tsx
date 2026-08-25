@@ -110,7 +110,7 @@ function CardsPage() {
   )
 
   return (
-    <div className="flex h-dvh w-full overflow-hidden pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]">
+    <div className="flex h-dvh min-h-0 w-full overflow-hidden pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]">
       {isDesktop ? (
         <>
           <aside className="w-72 shrink-0 border-r">{list}</aside>
@@ -134,7 +134,7 @@ function CardsPage() {
         <>
           <main className="min-w-0 flex-1">{list}</main>
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-            <SheetContent side="right" className="gap-0 p-0 data-[side=right]:w-[85%] sm:max-w-md">
+            <SheetContent side="right" className="min-h-0 gap-0 overflow-hidden p-0 data-[side=right]:w-[85%] sm:max-w-md">
               <SheetTitle className="sr-only">卡片详情</SheetTitle>
               {selected && (
                 <CardDetail

@@ -36,7 +36,7 @@ export function CardList({
   }
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full min-h-0 flex-col overflow-hidden">
       <div className="flex items-center justify-between border-b px-3 py-2">
         <div className="flex items-center gap-1.5">
           <span className="text-sm font-medium">卡片</span>
@@ -56,7 +56,7 @@ export function CardList({
           搜索
         </Button>
       </form>
-      <div className="flex-1 overflow-y-auto p-1.5">
+      <div className="min-h-0 flex-1 overflow-y-auto p-1.5">
         {cards.map((card) => {
           const snippet = keyword ? contentSnippet(card.content, keyword) : ''
           return (
