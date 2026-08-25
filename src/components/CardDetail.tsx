@@ -25,11 +25,12 @@ const TIME_FORMAT = 'YYYY-MM-DD HH:mm'
 type CardDetailProps = {
   card: Card
   keyword?: string
+  initialEditing?: boolean
   onDeleted: () => void
 }
 
-export function CardDetail({ card, keyword = '', onDeleted }: CardDetailProps) {
-  const [editing, setEditing] = useState(false)
+export function CardDetail({ card, keyword = '', initialEditing = false, onDeleted }: CardDetailProps) {
+  const [editing, setEditing] = useState(initialEditing)
   const [title, setTitle] = useState(card.title)
   const [level, setLevel] = useState(card.level)
   const [content, setContent] = useState(card.content)
@@ -78,7 +79,6 @@ export function CardDetail({ card, keyword = '', onDeleted }: CardDetailProps) {
         <div className="flex items-center gap-3 border-b px-4 py-3">
           <Input
             value={title}
-            autoFocus
             onChange={(e) => {
               setTitle(e.target.value)
               setError(null)
@@ -88,7 +88,7 @@ export function CardDetail({ card, keyword = '', onDeleted }: CardDetailProps) {
           <StarRating value={level} onChange={setLevel} />
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-3">
-          <MarkdownEditor initialContent={card.content} onChange={setContent} />
+          <MarkdownEditor initialContent={card.content} onChange={setContent} autoFocus />
         </div>
         <div className="flex items-center justify-between gap-2 border-t px-4 py-2.5">
           {error ? <p className="text-sm text-destructive">{error}</p> : <span />}
@@ -123,7 +123,7 @@ export function CardDetail({ card, keyword = '', onDeleted }: CardDetailProps) {
           </Button>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto px-4 py-3">
+      <div className="flex-1 overflow-y-auto px-4 py-3" onDoubleClick={startEdit}>
         <MarkdownView content={card.content} keyword={keyword} />
       </div>
       <div className="border-t px-4 py-2 text-xs text-muted-foreground">

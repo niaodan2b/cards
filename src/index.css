@@ -129,6 +129,11 @@
     }
 }
 
+@keyframes progress-indeterminate {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+
 @layer components {
   /* Markdown 正文排版（查看态 react-markdown 与编辑态 TipTap 共用） */
   .markdown-body {
@@ -157,6 +162,7 @@
   }
   .markdown-body strong {
     @apply font-semibold;
+    color: #BF3F36;
   }
   .markdown-body > :first-child,
   .markdown-body .ProseMirror > :first-child {
