@@ -2,5 +2,5 @@
   "default": "../src/assets/app-logo.png",
   "bg_color": "#ffffff",
   "android_fg": "../src/assets/app-logo-android-fg.png",
-  "android_fg_scale": 75
+  "android_fg_scale": 66
 }

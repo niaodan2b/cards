@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "cards",
+  "productName": "Cards",
   "version": "0.1.4",
   "identifier": "dev.niaodan.cards",
   "build": {
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "cards",
+        "title": "Cards",
         "width": 1200,
         "height": 800,
         "minWidth": 720,

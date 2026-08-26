@@ -34,7 +34,7 @@ def prepare_android_fg(
     output: Path,
     *,
     size: int = DEFAULT_SIZE,
-    scale_percent: float = 75,
+    scale_percent: float = 66,
 ) -> None:
     image = Image.open(source).convert("RGBA")
     if image.width != image.height:
@@ -60,7 +60,7 @@ def main() -> int:
     output = resolve_path(
         manifest.get("android_fg", "../src/assets/app-logo-android-fg.png")
     )
-    scale_percent = float(manifest.get("android_fg_scale", 75))
+    scale_percent = float(manifest.get("android_fg_scale", 66))
 
     if not source.exists():
         print(f"Source icon not found: {source}", file=sys.stderr)
