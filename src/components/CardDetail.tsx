@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import dayjs from 'dayjs'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Pencil, Save, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -126,9 +126,11 @@ export function CardDetail({ card, keyword = '', initialEditing = false, onDelet
           {error ? <p className="text-sm text-destructive">{error}</p> : <span />}
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={cancelEdit}>
+              <X />
               取消
             </Button>
             <Button size="sm" disabled={updateCard.isPending} onClick={() => void save()}>
+              <Save />
               保存
             </Button>
           </div>
@@ -151,12 +153,16 @@ export function CardDetail({ card, keyword = '', initialEditing = false, onDelet
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogCancel>
+              <X />
+              取消
+            </AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               disabled={removeCard.isPending}
               onClick={() => void confirmRemove()}
             >
+              <Trash2 />
               删除
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Download, X } from 'lucide-react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { Update } from '@tauri-apps/plugin-updater'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
@@ -173,7 +174,10 @@ function CardsPage() {
             </div>
           ) : null}
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={updating}>取消</AlertDialogCancel>
+            <AlertDialogCancel disabled={updating}>
+              <X />
+              取消
+            </AlertDialogCancel>
             <AlertDialogAction
               disabled={updating}
               onClick={(e) => {
@@ -181,6 +185,7 @@ function CardsPage() {
                 void handleInstallUpdate()
               }}
             >
+              <Download />
               更新
             </AlertDialogAction>
           </AlertDialogFooter>

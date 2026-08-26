@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Loader2, Plus } from 'lucide-react'
+import { Loader2, Plus, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { StarRating } from '@/components/StarRating'
@@ -53,6 +53,7 @@ export function CardList({
       <form className="flex items-center gap-1.5 border-b px-3 py-2" onSubmit={submit}>
         <Input value={draft} onChange={(e) => setDraft(e.target.value)} className="flex-1" />
         <Button type="submit" size="sm">
+          <Search />
           搜索
         </Button>
       </form>

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ListPlus, Save } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -92,9 +93,11 @@ export function CreateCardDialog({ open, onOpenChange, onCreated }: CreateCardDi
             disabled={createCard.isPending}
             onClick={() => void submit(true)}
           >
+            <ListPlus />
             保存后继续添加
           </Button>
           <Button disabled={createCard.isPending} onClick={() => void submit(false)}>
+            <Save />
             保存
           </Button>
         </DialogFooter>
