@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Loader2, Plus, Search } from 'lucide-react'
+import { Loader2, Plus, RotateCcw, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { StarRating } from '@/components/StarRating'
@@ -35,6 +35,11 @@ export function CardList({
     onSearch(draft.trim())
   }
 
+  const reset = () => {
+    setDraft('')
+    onSearch('')
+  }
+
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden">
       <div className="flex items-center justify-between border-b px-3 py-2">
@@ -52,10 +57,16 @@ export function CardList({
       </div>
       <form className="flex items-center gap-1.5 border-b px-3 py-2" onSubmit={submit}>
         <Input value={draft} onChange={(e) => setDraft(e.target.value)} className="flex-1" />
-        <Button type="submit" size="sm">
+        <Button type="submit">
           <Search />
           搜索
         </Button>
+        {keyword ? (
+          <Button type="button" variant="outline" onClick={reset}>
+            <RotateCcw />
+            重置
+          </Button>
+        ) : null}
       </form>
       <div className="min-h-0 flex-1 overflow-y-auto p-1.5">
         {cards.map((card) => {
