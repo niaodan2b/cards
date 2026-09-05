@@ -12,9 +12,13 @@ export type CreateCardPayload = {
   level: number
 }
 
-export type UpdateCardPayload = {
+export type UpdateCardContentPayload = {
+  id: number
+  content: string
+}
+
+export type UpdateCardMetaPayload = {
   id: number
   title: string
   level: number
-  content: string
 }

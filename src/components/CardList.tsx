@@ -56,13 +56,13 @@ export function CardList({
         </Button>
       </div>
       <form className="flex items-center gap-1.5 border-b px-3 py-2" onSubmit={submit}>
-        <Input value={draft} onChange={(e) => setDraft(e.target.value)} className="flex-1" />
-        <Button type="submit">
+        <Input value={draft} onChange={(e) => setDraft(e.target.value)} className="h-7 flex-1" />
+        <Button type="submit" size="sm">
           <Search />
           搜索
         </Button>
         {keyword ? (
-          <Button type="button" variant="outline" onClick={reset}>
+          <Button type="button" variant="outline" size="sm" onClick={reset}>
             <RotateCcw />
             重置
           </Button>

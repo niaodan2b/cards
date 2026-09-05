@@ -36,7 +36,7 @@ function CardsPage() {
   const [keyword, setKeyword] = useState('')
   const { data: cards = [] } = useCardList(keyword)
   const [selectedId, setSelectedId] = useState<number | null>(null)
-  const [editOnSelectId, setEditOnSelectId] = useState<number | null>(null)
+  const [autoFocusId, setAutoFocusId] = useState<number | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
   const [pendingUpdate, setPendingUpdate] = useState<Update | null>(null)
@@ -78,7 +78,7 @@ function CardsPage() {
 
   const handleSelect = (id: number) => {
     setSelectedId(id)
-    setEditOnSelectId(null)
+    setAutoFocusId(null)
     if (!isDesktop) {
       setSheetOpen(true)
     }
@@ -86,7 +86,7 @@ function CardsPage() {
 
   const handleCreated = (id: number) => {
     setSelectedId(id)
-    setEditOnSelectId(id)
+    setAutoFocusId(id)
     if (!isDesktop) {
       setSheetOpen(true)
     }
@@ -121,7 +121,7 @@ function CardsPage() {
                 key={selected.id}
                 card={selected}
                 keyword={keyword}
-                initialEditing={selected.id === editOnSelectId}
+                autoFocus={selected.id === autoFocusId}
                 onDeleted={handleDeleted}
               />
             ) : (
@@ -142,7 +142,7 @@ function CardsPage() {
                   key={selected.id}
                   card={selected}
                   keyword={keyword}
-                  initialEditing={selected.id === editOnSelectId}
+                  autoFocus={selected.id === autoFocusId}
                   onDeleted={handleDeleted}
                 />
               )}

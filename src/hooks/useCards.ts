@@ -19,10 +19,18 @@ export function useCreateCard() {
   })
 }
 
-export function useUpdateCard() {
+export function useUpdateCardContent() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: api.updateCard,
+    mutationFn: api.updateCardContent,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: CARDS_KEY }),
+  })
+}
+
+export function useUpdateCardMeta() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: api.updateCardMeta,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: CARDS_KEY }),
   })
 }
