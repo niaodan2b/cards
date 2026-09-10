@@ -75,12 +75,6 @@ export function CreateCardDialog({ open, onOpenChange, onCreated }: CreateCardDi
                 setTitle(e.target.value)
                 setError(null)
               }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
-                  e.preventDefault()
-                  if (canSave) void submit(false)
-                }
-              }}
             />
           </div>
           <div className="grid gap-1.5">
