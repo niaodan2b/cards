@@ -21,13 +21,14 @@ type CreateCardDialogProps = {
 
 export function CreateCardDialog({ open, onOpenChange, onCreated }: CreateCardDialogProps) {
   const [title, setTitle] = useState('')
-  const [level, setLevel] = useState(3)
+  const [level, setLevel] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const createCard = useCreateCard()
+  const canSave = level >= 1 && level <= 5
 
   const reset = () => {
     setTitle('')
-    setLevel(3)
+    setLevel(0)
     setError(null)
   }
 
@@ -37,6 +38,7 @@ export function CreateCardDialog({ open, onOpenChange, onCreated }: CreateCardDi
   }
 
   const submit = async (continueAdding: boolean) => {
+    if (!canSave) return
     const trimmed = title.trim()
     if (!trimmed) {
       setError('请填写标题')
@@ -76,7 +78,7 @@ export function CreateCardDialog({ open, onOpenChange, onCreated }: CreateCardDi
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
                   e.preventDefault()
-                  void submit(false)
+                  if (canSave) void submit(false)
                 }
               }}
             />
@@ -90,13 +92,13 @@ export function CreateCardDialog({ open, onOpenChange, onCreated }: CreateCardDi
         <DialogFooter className="gap-2">
           <Button
             variant="outline"
-            disabled={createCard.isPending}
+            disabled={!canSave || createCard.isPending}
             onClick={() => void submit(true)}
           >
             <ListPlus />
             保存后继续添加
           </Button>
-          <Button disabled={createCard.isPending} onClick={() => void submit(false)}>
+          <Button disabled={!canSave || createCard.isPending} onClick={() => void submit(false)}>
             <Save />
             保存
           </Button>

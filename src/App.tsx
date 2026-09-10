@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Download, X } from 'lucide-react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { Update } from '@tauri-apps/plugin-updater'
@@ -19,6 +19,7 @@ import { CardDetail } from '@/components/CardDetail'
 import { CreateCardDialog } from '@/components/CreateCardDialog'
 import { useCardList } from '@/hooks/useCards'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { ShortcutsProvider, useShortcutListener } from '@/hooks/useShortcuts'
 import {
   checkAppUpdate,
   getAppVersion,
@@ -35,6 +36,7 @@ function CardsPage() {
   const isDesktop = useMediaQuery('(min-width: 1024px)')
   const [keyword, setKeyword] = useState('')
   const { data: cards = [] } = useCardList(keyword)
+  const { data: allCards = [] } = useCardList()
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [autoFocusId, setAutoFocusId] = useState<number | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
@@ -97,6 +99,21 @@ function CardsPage() {
     setSheetOpen(false)
   }
 
+  const handleCreate = useCallback(() => {
+    setCreateOpen(true)
+  }, [])
+
+  const handleFocusSearch = useCallback(() => {
+    const el = document.getElementById('cards-search') as HTMLInputElement | null
+    el?.focus()
+    el?.select()
+  }, [])
+
+  useShortcutListener({
+    onCreateCard: handleCreate,
+    onSearch: handleFocusSearch,
+  })
+
   const list = (
     <CardList
       cards={cards}
@@ -104,8 +121,10 @@ function CardsPage() {
       selectedId={selectedId}
       appVersion={appVersion}
       checkingUpdate={checkingUpdate}
+      showFooter={isDesktop}
+      cardTotal={allCards.length}
       onSelect={handleSelect}
-      onCreate={() => setCreateOpen(true)}
+      onCreate={handleCreate}
       onSearch={setKeyword}
     />
   )
@@ -198,7 +217,9 @@ function CardsPage() {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <CardsPage />
+      <ShortcutsProvider>
+        <CardsPage />
+      </ShortcutsProvider>
     </QueryClientProvider>
   )
 }

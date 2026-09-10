@@ -232,6 +232,9 @@
   .markdown-body li p {
     @apply my-0;
   }
+  .markdown-body hr {
+    @apply my-4 border-0 border-t border-border;
+  }
   .markdown-body strong {
     @apply font-semibold;
     color: #BF3F36;

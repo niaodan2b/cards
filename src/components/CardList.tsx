@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from 'react'
-import { Loader2, Plus, RotateCcw, Search } from 'lucide-react'
+import { Loader2, Plus, RotateCcw, Search, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { StarRating } from '@/components/StarRating'
+import { SettingsDialog } from '@/components/SettingsDialog'
 import { cn } from '@/lib/utils'
 import { contentSnippet, highlightText } from '@/lib/highlight'
 import type { Card } from '@/lib/types'
@@ -13,6 +14,8 @@ type CardListProps = {
   selectedId: number | null
   appVersion?: string
   checkingUpdate?: boolean
+  showFooter?: boolean
+  cardTotal?: number
   onSelect: (id: number) => void
   onCreate: () => void
   onSearch: (keyword: string) => void
@@ -24,11 +27,14 @@ export function CardList({
   selectedId,
   appVersion,
   checkingUpdate,
+  showFooter = false,
+  cardTotal = 0,
   onSelect,
   onCreate,
   onSearch,
 }: CardListProps) {
   const [draft, setDraft] = useState(keyword)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   const submit = (e: FormEvent) => {
     e.preventDefault()
@@ -56,7 +62,12 @@ export function CardList({
         </Button>
       </div>
       <form className="flex items-center gap-1.5 border-b px-3 py-2" onSubmit={submit}>
-        <Input value={draft} onChange={(e) => setDraft(e.target.value)} className="h-7 flex-1" />
+        <Input
+          id="cards-search"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          className="h-7 flex-1"
+        />
         <Button type="submit" size="sm">
           <Search />
           搜索
@@ -92,6 +103,23 @@ export function CardList({
           )
         })}
       </div>
+      {showFooter ? (
+        <>
+          <div className="flex h-8 shrink-0 items-center justify-between border-t px-3">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-xs"
+              aria-label="设置"
+              onClick={() => setSettingsOpen(true)}
+            >
+              <Settings />
+            </Button>
+            <span className="text-xs tabular-nums text-muted-foreground">{cardTotal}</span>
+          </div>
+          <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
+        </>
+      ) : null}
     </div>
   )
 }

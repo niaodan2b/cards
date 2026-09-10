@@ -3,6 +3,8 @@ import { EditorContent, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { Markdown } from '@tiptap/markdown'
 import { KeywordHighlight } from '@/lib/keywordHighlight'
+import { LineOperations } from '@/lib/lineOperations'
+import { registerActiveEditor } from '@/lib/editorRegistry'
 
 type MarkdownEditorProps = {
   content: string
@@ -16,7 +18,6 @@ const starterKit = StarterKit.configure({
   blockquote: false,
   code: false,
   codeBlock: false,
-  horizontalRule: false,
   italic: false,
   link: false,
   orderedList: false,
@@ -26,7 +27,7 @@ const starterKit = StarterKit.configure({
   heading: { levels: [2, 3, 4] },
 })
 
-// 仅保留加粗 / 小标题(2-4级) / 无序列表，其余 StarterKit 扩展全部禁用
+// 仅保留加粗 / 小标题(2-4级) / 无序列表 / 水平分割线，其余 StarterKit 扩展全部禁用
 export function MarkdownEditor({
   content,
   onChange,
@@ -43,6 +44,7 @@ export function MarkdownEditor({
     starterKit,
     Markdown,
     KeywordHighlight.configure({ keyword }),
+    LineOperations,
   ]).current
 
   const editor = useEditor({
@@ -58,6 +60,14 @@ export function MarkdownEditor({
       onBlurRef.current?.(instance.getMarkdown())
     },
   })
+
+  useEffect(() => {
+    if (!editor) return
+    registerActiveEditor(editor)
+    return () => {
+      registerActiveEditor(null)
+    }
+  }, [editor])
 
   useEffect(() => {
     if (!editor || !autoFocus) return

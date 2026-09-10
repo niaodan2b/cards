@@ -122,7 +122,7 @@ export function CardDetail({ card, keyword = '', autoFocus = false, onDeleted }:
           }}
         />
       </div>
-      <div className="shrink-0 border-t px-4 py-2 text-xs text-muted-foreground">
+      <div className="flex h-8 shrink-0 items-center border-t px-4 text-xs text-muted-foreground">
         创建于 {dayjs(card.create_time).fromNow()} · 更新于 {dayjs(card.update_time).fromNow()}
       </div>
       {error && <p className="border-t px-4 py-2 text-sm text-destructive">{error}</p>}
