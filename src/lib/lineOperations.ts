@@ -11,6 +11,10 @@ declare module '@tiptap/core' {
       deleteLine: () => ReturnType
       insertLineBelow: () => ReturnType
       insertLineAbove: () => ReturnType
+      goToLineStart: () => ReturnType
+      goToLineEnd: () => ReturnType
+      selectToLineStart: () => ReturnType
+      selectToLineEnd: () => ReturnType
     }
   }
 }
@@ -118,6 +122,16 @@ function deleteBlock(state: EditorState): Transaction | null {
   return tr.scrollIntoView()
 }
 
+function setLineEdge(state: EditorState, side: 'start' | 'end', extend: boolean): Transaction | null {
+  const { $head, anchor } = state.selection
+  if (!$head.parent.isTextblock) return null
+  const target = side === 'start' ? $head.start() : $head.end()
+  const nextAnchor = extend ? anchor : target
+  if (nextAnchor === $head.pos && target === $head.pos) return null
+  const tr = state.tr.setSelection(TextSelection.create(state.doc, nextAnchor, target))
+  return tr.scrollIntoView()
+}
+
 function insertBlock(state: EditorState, where: 'before' | 'after'): Transaction | null {
   const range = getBlockRange(state)
   if (!range) return null
@@ -179,6 +193,38 @@ export const LineOperations = Extension.create({
         () =>
         ({ state, dispatch }) => {
           const tr = insertBlock(state, 'before')
+          if (!tr) return false
+          dispatch?.(tr)
+          return true
+        },
+      goToLineStart:
+        () =>
+        ({ state, dispatch }) => {
+          const tr = setLineEdge(state, 'start', false)
+          if (!tr) return false
+          dispatch?.(tr)
+          return true
+        },
+      goToLineEnd:
+        () =>
+        ({ state, dispatch }) => {
+          const tr = setLineEdge(state, 'end', false)
+          if (!tr) return false
+          dispatch?.(tr)
+          return true
+        },
+      selectToLineStart:
+        () =>
+        ({ state, dispatch }) => {
+          const tr = setLineEdge(state, 'start', true)
+          if (!tr) return false
+          dispatch?.(tr)
+          return true
+        },
+      selectToLineEnd:
+        () =>
+        ({ state, dispatch }) => {
+          const tr = setLineEdge(state, 'end', true)
           if (!tr) return false
           dispatch?.(tr)
           return true

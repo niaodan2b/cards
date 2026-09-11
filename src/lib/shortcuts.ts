@@ -7,6 +7,10 @@ export const SHORTCUT_ACTIONS = [
   'deleteLine',
   'insertLineBelow',
   'insertLineAbove',
+  'goToLineStart',
+  'goToLineEnd',
+  'selectToLineStart',
+  'selectToLineEnd',
 ] as const
 
 export type ShortcutAction = (typeof SHORTCUT_ACTIONS)[number]
@@ -20,6 +24,10 @@ export const LINE_ACTIONS = [
   'deleteLine',
   'insertLineBelow',
   'insertLineAbove',
+  'goToLineStart',
+  'goToLineEnd',
+  'selectToLineStart',
+  'selectToLineEnd',
 ] as const satisfies readonly ShortcutAction[]
 
 export const SHORTCUT_LABELS: Record<ShortcutAction, string> = {
@@ -31,6 +39,10 @@ export const SHORTCUT_LABELS: Record<ShortcutAction, string> = {
   deleteLine: '删除当前行',
   insertLineBelow: '向下插入行',
   insertLineAbove: '向上插入行',
+  goToLineStart: '移动光标至行首',
+  goToLineEnd: '移动光标至行尾',
+  selectToLineStart: '选中至行首',
+  selectToLineEnd: '选中至行尾',
 }
 
 export const DEFAULT_SHORTCUTS: ShortcutBindings = {
@@ -42,6 +54,10 @@ export const DEFAULT_SHORTCUTS: ShortcutBindings = {
   deleteLine: 'Mod+Shift+KeyK',
   insertLineBelow: 'Mod+Enter',
   insertLineAbove: 'Mod+Shift+Enter',
+  goToLineStart: 'Mod+ArrowLeft',
+  goToLineEnd: 'Mod+ArrowRight',
+  selectToLineStart: 'Mod+Shift+ArrowLeft',
+  selectToLineEnd: 'Mod+Shift+ArrowRight',
 }
 
 export const SHORTCUTS_STORAGE_KEY = 'cards.shortcuts'
@@ -51,6 +67,8 @@ const CODE_LABELS: Record<string, string> = {
   ArrowDown: '↓',
   ArrowLeft: '←',
   ArrowRight: '→',
+  Home: 'Home',
+  End: 'End',
   Enter: 'Enter',
   Space: 'Space',
   Tab: 'Tab',
@@ -107,7 +125,10 @@ export function eventToBinding(event: KeyboardEvent): string | null {
 }
 
 export function isUsableBinding(binding: string) {
-  const mods = binding.split('+').slice(0, -1)
+  const parts = binding.split('+')
+  const code = parts[parts.length - 1]
+  const mods = parts.slice(0, -1)
+  if (code === 'Home' || code === 'End') return true
   return mods.includes('Mod') || mods.includes('Ctrl') || mods.includes('Alt') || mods.includes('Meta')
 }
 

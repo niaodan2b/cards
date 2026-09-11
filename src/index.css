@@ -239,6 +239,9 @@
     @apply font-semibold;
     color: #BF3F36;
   }
+  .markdown-body .hashtag {
+    @apply font-medium text-primary;
+  }
   .markdown-body .ProseMirror > :first-child {
     @apply mt-0;
   }

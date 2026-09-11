@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { EditorContent, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { Markdown } from '@tiptap/markdown'
+import { HashtagHighlight } from '@/lib/hashtagHighlight'
 import { KeywordHighlight } from '@/lib/keywordHighlight'
 import { LineOperations } from '@/lib/lineOperations'
 import { registerActiveEditor } from '@/lib/editorRegistry'
@@ -43,6 +44,7 @@ export function MarkdownEditor({
   const extensions = useRef([
     starterKit,
     Markdown,
+    HashtagHighlight,
     KeywordHighlight.configure({ keyword }),
     LineOperations,
   ]).current

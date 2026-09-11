@@ -84,6 +84,10 @@ export function useShortcutListener({ onCreateCard, onSearch }: ShortcutListener
         if (action === 'deleteLine') editor.commands.deleteLine()
         if (action === 'insertLineBelow') editor.commands.insertLineBelow()
         if (action === 'insertLineAbove') editor.commands.insertLineAbove()
+        if (action === 'goToLineStart') editor.commands.goToLineStart()
+        if (action === 'goToLineEnd') editor.commands.goToLineEnd()
+        if (action === 'selectToLineStart') editor.commands.selectToLineStart()
+        if (action === 'selectToLineEnd') editor.commands.selectToLineEnd()
         return
       }
 
