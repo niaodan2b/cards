@@ -3,6 +3,7 @@ export type Card = {
   title: string
   content: string
   level: number
+  pinned: boolean
   create_time: string
   update_time: string
 }
@@ -21,4 +22,9 @@ export type UpdateCardMetaPayload = {
   id: number
   title: string
   level: number
+}
+
+export type UpdateCardPinPayload = {
+  id: number
+  pinned: boolean
 }

@@ -8,9 +8,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { StarRating } from '@/components/StarRating'
+import { TitleAutocompleteInput } from '@/components/TitleAutocompleteInput'
 import { useCreateCard } from '@/hooks/useCards'
 
 type CreateCardDialogProps = {
@@ -67,12 +67,12 @@ export function CreateCardDialog({ open, onOpenChange, onCreated }: CreateCardDi
         <div className="grid gap-3">
           <div className="grid gap-1.5">
             <Label htmlFor="card-title">标题</Label>
-            <Input
+            <TitleAutocompleteInput
               id="card-title"
               value={title}
               autoFocus
-              onChange={(e) => {
-                setTitle(e.target.value)
+              onChange={(next) => {
+                setTitle(next)
                 setError(null)
               }}
             />

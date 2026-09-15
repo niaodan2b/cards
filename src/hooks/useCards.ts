@@ -35,6 +35,14 @@ export function useUpdateCardMeta() {
   })
 }
 
+export function useUpdateCardPin() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: api.updateCardPin,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: CARDS_KEY }),
+  })
+}
+
 export function useRemoveCard() {
   const queryClient = useQueryClient()
   return useMutation({

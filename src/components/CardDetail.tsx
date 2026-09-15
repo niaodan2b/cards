@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/zh-cn'
-import { ChevronLeft, Ellipsis, Pencil, Trash2, X } from 'lucide-react'
+import { ChevronLeft, Ellipsis, Pencil, Pin, PinOff, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   AlertDialog,
@@ -24,7 +24,7 @@ import {
 import { StarRating } from '@/components/StarRating'
 import { MarkdownEditor } from '@/components/MarkdownEditor'
 import { EditCardDialog } from '@/components/EditCardDialog'
-import { useRemoveCard, useUpdateCardContent } from '@/hooks/useCards'
+import { useRemoveCard, useUpdateCardContent, useUpdateCardPin } from '@/hooks/useCards'
 import { api } from '@/lib/api'
 import { highlightText } from '@/lib/highlight'
 import type { Card } from '@/lib/types'
@@ -49,6 +49,7 @@ export function CardDetail({ card, keyword = '', autoFocus = false, onBack, onDe
   const savedContentRef = useRef(card.content)
   const queryClient = useQueryClient()
   const updateContent = useUpdateCardContent()
+  const updatePin = useUpdateCardPin()
   const removeCard = useRemoveCard()
 
   contentRef.current = content
@@ -89,6 +90,15 @@ export function CardDetail({ card, keyword = '', autoFocus = false, onBack, onDe
     }
   }
 
+  const togglePin = async () => {
+    try {
+      await updatePin.mutateAsync({ id: card.id, pinned: !card.pinned })
+      setError(null)
+    } catch (err) {
+      setError((err as Error).message)
+    }
+  }
+
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden">
       <div className="flex shrink-0 items-start justify-between gap-3 border-b px-4 py-3">
@@ -103,21 +113,26 @@ export function CardDetail({ card, keyword = '', autoFocus = false, onBack, onDe
             <StarRating value={card.level} />
           </div>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />}>
-            <Ellipsis />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-auto">
-            <DropdownMenuItem onClick={() => setEditOpen(true)}>
-              <Pencil />
-              编辑
-            </DropdownMenuItem>
-            <DropdownMenuItem variant="destructive" onClick={() => setConfirmOpen(true)}>
-              <Trash2 />
-              删除
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex shrink-0 items-center gap-1">
+          <Button variant="ghost" size="icon-sm" disabled={updatePin.isPending} onClick={() => void togglePin()}>
+            {card.pinned ? <PinOff /> : <Pin />}
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />}>
+              <Ellipsis />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-auto">
+              <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                <Pencil />
+                编辑
+              </DropdownMenuItem>
+              <DropdownMenuItem variant="destructive" onClick={() => setConfirmOpen(true)}>
+                <Trash2 />
+                删除
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
         <MarkdownEditor

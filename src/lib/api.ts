@@ -1,4 +1,10 @@
-import type { Card, CreateCardPayload, UpdateCardContentPayload, UpdateCardMetaPayload } from './types'
+import type {
+  Card,
+  CreateCardPayload,
+  UpdateCardContentPayload,
+  UpdateCardMetaPayload,
+  UpdateCardPinPayload,
+} from './types'
 
 const BASE = import.meta.env.VITE_API_URL as string
 
@@ -42,6 +48,8 @@ export const api = {
     request<null>('/cards/update-content', { method: 'POST', body: JSON.stringify(payload) }),
   updateCardMeta: (payload: UpdateCardMetaPayload) =>
     request<null>('/cards/update-meta', { method: 'POST', body: JSON.stringify(payload) }),
+  updateCardPin: (payload: UpdateCardPinPayload) =>
+    request<null>('/cards/update-pin', { method: 'POST', body: JSON.stringify(payload) }),
   removeCard: (id: number) =>
     request<null>('/cards/remove', { method: 'POST', body: JSON.stringify({ id }) }),
 }

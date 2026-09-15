@@ -8,9 +8,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { StarRating } from '@/components/StarRating'
+import { TitleAutocompleteInput } from '@/components/TitleAutocompleteInput'
 import { useUpdateCardMeta } from '@/hooks/useCards'
 import type { Card } from '@/lib/types'
 
@@ -56,12 +56,13 @@ export function EditCardDialog({ open, onOpenChange, card }: EditCardDialogProps
         <div className="grid gap-3">
           <div className="grid gap-1.5">
             <Label htmlFor="edit-card-title">标题</Label>
-            <Input
+            <TitleAutocompleteInput
               id="edit-card-title"
               value={title}
               autoFocus
-              onChange={(e) => {
-                setTitle(e.target.value)
+              excludeId={card.id}
+              onChange={(next) => {
+                setTitle(next)
                 setError(null)
               }}
             />

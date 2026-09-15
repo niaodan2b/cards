@@ -32,6 +32,7 @@ import {
 const queryClient = new QueryClient()
 
 type DetailHistoryState = { cardDetail: number }
+type SearchHistoryState = { cardSearch: true }
 
 function isDetailState(state: unknown): state is DetailHistoryState {
   return (
@@ -39,6 +40,15 @@ function isDetailState(state: unknown): state is DetailHistoryState {
     state !== null &&
     'cardDetail' in state &&
     typeof (state as DetailHistoryState).cardDetail === 'number'
+  )
+}
+
+function isSearchState(state: unknown): state is SearchHistoryState {
+  return (
+    typeof state === 'object' &&
+    state !== null &&
+    'cardSearch' in state &&
+    (state as SearchHistoryState).cardSearch === true
   )
 }
 
@@ -93,6 +103,9 @@ function CardsPage() {
         setSelectedId(history.state.cardDetail)
       } else {
         setSelectedId(null)
+        if (!isSearchState(history.state)) {
+          setKeyword('')
+        }
       }
     }
     window.addEventListener('popstate', onPop)
@@ -132,6 +145,19 @@ function CardsPage() {
     }
   }
 
+  const handleSearch = (q: string) => {
+    const next = q.trim()
+    setKeyword(next)
+    if (isDesktop) return
+    if (next) {
+      if (!isSearchState(history.state) && !isDetailState(history.state)) {
+        history.pushState({ cardSearch: true }, '')
+      }
+    } else if (isSearchState(history.state)) {
+      history.back()
+    }
+  }
+
   const handleCreate = useCallback(() => {
     setCreateOpen(true)
   }, [])
@@ -158,7 +184,7 @@ function CardsPage() {
       cardTotal={allCards.length}
       onSelect={handleSelect}
       onCreate={handleCreate}
-      onSearch={setKeyword}
+      onSearch={handleSearch}
     />
   )
 
