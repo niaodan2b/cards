@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { Download, X } from 'lucide-react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { Update } from '@tauri-apps/plugin-updater'
-import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +31,17 @@ import {
 
 const queryClient = new QueryClient()
 
+type DetailHistoryState = { cardDetail: number }
+
+function isDetailState(state: unknown): state is DetailHistoryState {
+  return (
+    typeof state === 'object' &&
+    state !== null &&
+    'cardDetail' in state &&
+    typeof (state as DetailHistoryState).cardDetail === 'number'
+  )
+}
+
 function CardsPage() {
   const isDesktop = useMediaQuery('(min-width: 1024px)')
   const [keyword, setKeyword] = useState('')
@@ -40,7 +50,6 @@ function CardsPage() {
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [autoFocusId, setAutoFocusId] = useState<number | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
-  const [sheetOpen, setSheetOpen] = useState(false)
   const [pendingUpdate, setPendingUpdate] = useState<Update | null>(null)
   const [updating, setUpdating] = useState(false)
   const [updateProgress, setUpdateProgress] = useState<UpdateProgress | null>(null)
@@ -78,25 +87,49 @@ function CardsPage() {
     }
   }
 
+  useEffect(() => {
+    const onPop = () => {
+      if (isDetailState(history.state)) {
+        setSelectedId(history.state.cardDetail)
+      } else {
+        setSelectedId(null)
+      }
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+
   const handleSelect = (id: number) => {
     setSelectedId(id)
     setAutoFocusId(null)
     if (!isDesktop) {
-      setSheetOpen(true)
+      if (isDetailState(history.state)) {
+        history.replaceState({ cardDetail: id }, '')
+      } else {
+        history.pushState({ cardDetail: id }, '')
+      }
     }
   }
 
   const handleCreated = (id: number) => {
+    if (!isDesktop) return
     setSelectedId(id)
     setAutoFocusId(id)
-    if (!isDesktop) {
-      setSheetOpen(true)
-    }
   }
 
   const handleDeleted = () => {
     setSelectedId(null)
-    setSheetOpen(false)
+    if (isDetailState(history.state)) {
+      history.back()
+    }
+  }
+
+  const handleBack = () => {
+    if (isDetailState(history.state)) {
+      history.back()
+    } else {
+      setSelectedId(null)
+    }
   }
 
   const handleCreate = useCallback(() => {
@@ -150,24 +183,19 @@ function CardsPage() {
             )}
           </main>
         </>
+      ) : selected ? (
+        <main className="min-w-0 flex-1">
+          <CardDetail
+            key={selected.id}
+            card={selected}
+            keyword={keyword}
+            autoFocus={selected.id === autoFocusId}
+            onBack={handleBack}
+            onDeleted={handleDeleted}
+          />
+        </main>
       ) : (
-        <>
-          <main className="min-w-0 flex-1">{list}</main>
-          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-            <SheetContent side="right" className="min-h-0 gap-0 overflow-hidden p-0 data-[side=right]:w-[85%] sm:max-w-md">
-              <SheetTitle className="sr-only">卡片详情</SheetTitle>
-              {selected && (
-                <CardDetail
-                  key={selected.id}
-                  card={selected}
-                  keyword={keyword}
-                  autoFocus={selected.id === autoFocusId}
-                  onDeleted={handleDeleted}
-                />
-              )}
-            </SheetContent>
-          </Sheet>
-        </>
+        <main className="min-w-0 flex-1">{list}</main>
       )}
       <CreateCardDialog open={createOpen} onOpenChange={setCreateOpen} onCreated={handleCreated} />
 

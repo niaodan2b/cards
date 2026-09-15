@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/zh-cn'
-import { Ellipsis, Pencil, Trash2, X } from 'lucide-react'
+import { ChevronLeft, Ellipsis, Pencil, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   AlertDialog,
@@ -36,10 +36,11 @@ type CardDetailProps = {
   card: Card
   keyword?: string
   autoFocus?: boolean
+  onBack?: () => void
   onDeleted: () => void
 }
 
-export function CardDetail({ card, keyword = '', autoFocus = false, onDeleted }: CardDetailProps) {
+export function CardDetail({ card, keyword = '', autoFocus = false, onBack, onDeleted }: CardDetailProps) {
   const [content, setContent] = useState(card.content)
   const [error, setError] = useState<string | null>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -91,9 +92,16 @@ export function CardDetail({ card, keyword = '', autoFocus = false, onDeleted }:
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden">
       <div className="flex shrink-0 items-start justify-between gap-3 border-b px-4 py-3">
-        <div className="flex min-w-0 flex-col gap-1.5">
-          <h2 className="truncate text-base font-medium">{highlightText(card.title, keyword)}</h2>
-          <StarRating value={card.level} />
+        <div className="flex min-w-0 items-start gap-1">
+          {onBack ? (
+            <Button variant="ghost" size="icon-sm" onClick={onBack}>
+              <ChevronLeft />
+            </Button>
+          ) : null}
+          <div className="flex min-w-0 flex-col gap-1.5">
+            <h2 className="truncate text-base font-medium">{highlightText(card.title, keyword)}</h2>
+            <StarRating value={card.level} />
+          </div>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />}>
