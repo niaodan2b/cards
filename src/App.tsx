@@ -67,7 +67,7 @@ function CardsPage() {
   const [appVersion, setAppVersion] = useState('')
   const [checkingUpdate, setCheckingUpdate] = useState(isTauri)
 
-  const selected = cards.find((card) => card.id === selectedId) ?? null
+  const selected = allCards.find((card) => card.id === selectedId) ?? null
 
   useEffect(() => {
     let cancelled = false

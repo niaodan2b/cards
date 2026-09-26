@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent, type PointerEvent as ReactPointerEvent, type TouchEvent as ReactTouchEvent } from 'react'
-import { Loader2, Pin, PinOff, Plus, RotateCcw, Search, Settings } from 'lucide-react'
+import { Loader2, Pin, PinOff, Plus, RotateCcw, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { CardSearchInput } from '@/components/CardSearchInput'
 import { Toggle } from '@/components/ui/toggle'
 import {
   ContextMenu,
@@ -113,7 +113,7 @@ export function CardList({
           新增
         </Button>
       </div>
-      <form className="flex items-center gap-1.5 border-b px-3 py-2" onSubmit={submit}>
+      <form className="relative z-10 flex items-center gap-1.5 border-b px-3 py-2" onSubmit={submit}>
         <Toggle
           type="button"
           variant="outline"
@@ -123,15 +123,7 @@ export function CardList({
         >
           Recent
         </Toggle>
-        <div className="relative min-w-0 flex-1">
-          <Input
-            id="cards-search"
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            className="h-7 pr-7"
-          />
-          <Search className="pointer-events-none absolute top-1/2 right-2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-        </div>
+        <CardSearchInput id="cards-search" value={draft} onChange={setDraft} onPick={onSelect} />
         {keyword ? (
           <Button type="button" variant="outline" size="sm" onClick={reset}>
             <RotateCcw />
