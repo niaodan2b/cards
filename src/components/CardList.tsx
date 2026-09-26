@@ -1,10 +1,17 @@
-import { useEffect, useState, type FormEvent } from 'react'
-import { Loader2, Pin, Plus, RotateCcw, Search, Settings } from 'lucide-react'
+import { useEffect, useRef, useState, type FormEvent, type PointerEvent as ReactPointerEvent, type TouchEvent as ReactTouchEvent } from 'react'
+import { Loader2, Pin, PinOff, Plus, RotateCcw, Search, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Toggle } from '@/components/ui/toggle'
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from '@/components/ui/context-menu'
 import { StarRating } from '@/components/StarRating'
 import { SettingsDialog } from '@/components/SettingsDialog'
+import { useUpdateCardPin } from '@/hooks/useCards'
 import { cn } from '@/lib/utils'
 import { contentSnippet, highlightText } from '@/lib/highlight'
 import type { Card } from '@/lib/types'
@@ -53,6 +60,8 @@ export function CardList({
   const [draft, setDraft] = useState(keyword)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [recent, setRecent] = useState(loadRecentSort)
+  const [error, setError] = useState<string | null>(null)
+  const updatePin = useUpdateCardPin()
 
   useEffect(() => {
     setDraft(keyword)
@@ -78,6 +87,15 @@ export function CardList({
   const reset = () => {
     setDraft('')
     onSearch('')
+  }
+
+  const togglePin = async (card: Card) => {
+    try {
+      await updatePin.mutateAsync({ id: card.id, pinned: !card.pinned })
+      setError(null)
+    } catch (err) {
+      setError((err as Error).message)
+    }
   }
 
   return (
@@ -121,34 +139,18 @@ export function CardList({
           </Button>
         ) : null}
       </form>
+      {error ? <p className="border-b px-3 py-1.5 text-sm text-destructive">{error}</p> : null}
       <div className="min-h-0 flex-1 overflow-y-auto p-1.5">
-        {displayedCards.map((card) => {
-          const snippet = keyword ? contentSnippet(card.content, keyword) : ''
-          return (
-            <button
-              key={card.id}
-              type="button"
-              onClick={() => onSelect(card.id)}
-              className={cn(
-                'flex w-full flex-col gap-1 rounded-lg px-2.5 py-2 text-left outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/50',
-                selectedId === card.id && 'bg-muted',
-              )}
-            >
-              <div className="flex w-full min-w-0 items-center gap-2">
-                <span className="flex min-w-0 flex-1 flex-col gap-1">
-                  <span className="truncate text-sm">{highlightText(card.title, keyword)}</span>
-                  <StarRating value={card.level} />
-                  {snippet ? (
-                    <span className="line-clamp-1 text-xs text-muted-foreground">
-                      {highlightText(snippet, keyword)}
-                    </span>
-                  ) : null}
-                </span>
-                {card.pinned ? <Pin className="size-3.5 shrink-0 text-muted-foreground" /> : null}
-              </div>
-            </button>
-          )
-        })}
+        {displayedCards.map((card) => (
+          <CardListItem
+            key={card.id}
+            card={card}
+            keyword={keyword}
+            selected={selectedId === card.id}
+            onSelect={onSelect}
+            onTogglePin={(target) => void togglePin(target)}
+          />
+        ))}
       </div>
       {showFooter ? (
         <>
@@ -168,5 +170,80 @@ export function CardList({
         </>
       ) : null}
     </div>
+  )
+}
+
+type CardListItemProps = {
+  card: Card
+  keyword: string
+  selected: boolean
+  onSelect: (id: number) => void
+  onTogglePin: (card: Card) => void
+}
+
+function CardListItem({ card, keyword, selected, onSelect, onTogglePin }: CardListItemProps) {
+  const pointerTypeRef = useRef('mouse')
+  const suppressClickRef = useRef(false)
+  const snippet = keyword ? contentSnippet(card.content, keyword) : ''
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open || pointerTypeRef.current !== 'touch') return
+    suppressClickRef.current = true
+    window.setTimeout(() => {
+      suppressClickRef.current = false
+    }, 350)
+  }
+
+  const handlePointerDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    pointerTypeRef.current = event.pointerType
+  }
+
+  const handleTouchStart = () => {
+    pointerTypeRef.current = 'touch'
+  }
+
+  const handleTouchEnd = (event: ReactTouchEvent<HTMLButtonElement>) => {
+    if (suppressClickRef.current) event.preventDefault()
+  }
+
+  const handleClick = () => {
+    if (suppressClickRef.current) {
+      suppressClickRef.current = false
+      return
+    }
+    onSelect(card.id)
+  }
+
+  return (
+    <ContextMenu onOpenChange={handleOpenChange}>
+      <ContextMenuTrigger
+        render={<button type="button" />}
+        className={cn(
+          'flex w-full flex-col gap-1 rounded-lg px-2.5 py-2 text-left outline-none select-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/50 data-popup-open:bg-muted',
+          selected && 'bg-muted',
+        )}
+        onPointerDown={handlePointerDown}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onClick={handleClick}
+      >
+        <div className="flex w-full min-w-0 items-center gap-2">
+          <span className="flex min-w-0 flex-1 flex-col gap-1">
+            <span className="truncate text-sm">{highlightText(card.title, keyword)}</span>
+            <StarRating value={card.level} />
+            {snippet ? (
+              <span className="line-clamp-1 text-xs text-muted-foreground">{highlightText(snippet, keyword)}</span>
+            ) : null}
+          </span>
+          {card.pinned ? <Pin className="size-3.5 shrink-0 text-muted-foreground" /> : null}
+        </div>
+      </ContextMenuTrigger>
+      <ContextMenuContent>
+        <ContextMenuItem onClick={() => onTogglePin(card)}>
+          {card.pinned ? <PinOff /> : <Pin />}
+          {card.pinned ? '取消置顶' : '置顶'}
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   )
 }
