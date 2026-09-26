@@ -18,6 +18,7 @@ import { CardDetail } from '@/components/CardDetail'
 import { CreateCardDialog } from '@/components/CreateCardDialog'
 import { useCardList } from '@/hooks/useCards'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { cn } from '@/lib/utils'
 import { ShortcutsProvider, useShortcutListener } from '@/hooks/useShortcuts'
 import {
   checkAppUpdate,
@@ -209,19 +210,30 @@ function CardsPage() {
             )}
           </main>
         </>
-      ) : selected ? (
-        <main className="min-w-0 flex-1">
-          <CardDetail
-            key={selected.id}
-            card={selected}
-            keyword={keyword}
-            autoFocus={selected.id === autoFocusId}
-            onBack={handleBack}
-            onDeleted={handleDeleted}
-          />
-        </main>
       ) : (
-        <main className="min-w-0 flex-1">{list}</main>
+        <main className="grid min-h-0 min-w-0 flex-1 grid-rows-[minmax(0,1fr)]">
+          <div
+            className={cn(
+              'col-start-1 row-start-1 h-full min-h-0 overflow-hidden',
+              selected && 'pointer-events-none invisible',
+            )}
+            inert={!!selected}
+          >
+            {list}
+          </div>
+          {selected ? (
+            <div className="col-start-1 row-start-1 h-full min-h-0 overflow-hidden">
+              <CardDetail
+                key={selected.id}
+                card={selected}
+                keyword={keyword}
+                autoFocus={selected.id === autoFocusId}
+                onBack={handleBack}
+                onDeleted={handleDeleted}
+              />
+            </div>
+          ) : null}
+        </main>
       )}
       <CreateCardDialog open={createOpen} onOpenChange={setCreateOpen} onCreated={handleCreated} />
 
