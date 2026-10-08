@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent, type PointerEvent as ReactPointerEvent, type TouchEvent as ReactTouchEvent } from 'react'
+import { useEffect, useRef, useState, type ComponentProps, type FormEvent } from 'react'
 import { Loader2, Pin, PinOff, Plus, RotateCcw, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CardSearchInput } from '@/components/CardSearchInput'
@@ -173,6 +173,14 @@ type CardListItemProps = {
   onTogglePin: (card: Card) => void
 }
 
+// Base UI 的 ContextMenuTrigger 不随 render 的元素收窄事件类型，仍按 div 推导，这里直接取它的处理函数参数类型。
+type TriggerPointerDownEvent = Parameters<
+  NonNullable<ComponentProps<typeof ContextMenuTrigger>['onPointerDown']>
+>[0]
+type TriggerTouchEndEvent = Parameters<
+  NonNullable<ComponentProps<typeof ContextMenuTrigger>['onTouchEnd']>
+>[0]
+
 function CardListItem({ card, keyword, selected, onSelect, onTogglePin }: CardListItemProps) {
   const pointerTypeRef = useRef('mouse')
   const suppressClickRef = useRef(false)
@@ -186,7 +194,7 @@ function CardListItem({ card, keyword, selected, onSelect, onTogglePin }: CardLi
     }, 350)
   }
 
-  const handlePointerDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
+  const handlePointerDown = (event: TriggerPointerDownEvent) => {
     pointerTypeRef.current = event.pointerType
   }
 
@@ -194,7 +202,7 @@ function CardListItem({ card, keyword, selected, onSelect, onTogglePin }: CardLi
     pointerTypeRef.current = 'touch'
   }
 
-  const handleTouchEnd = (event: ReactTouchEvent<HTMLButtonElement>) => {
+  const handleTouchEnd = (event: TriggerTouchEndEvent) => {
     if (suppressClickRef.current) event.preventDefault()
   }
 
