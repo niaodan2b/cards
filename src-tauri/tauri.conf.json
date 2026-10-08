@@ -44,7 +44,7 @@
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDY0M0E4NkE3RjJGN0MzOQpSV1E1ZkM5L2FxaERCbVJSYjkxK05UWCs0ZUZXTzY2UGdKWkhzYUdkMFVveUNYS3I0L2dTekdnMwo=",
       "endpoints": [
-        "https://niaodan.dev:10020/cards/stable/{{target}}/{{arch}}/{{current_version}}"
+        "https://github.com/niaodan2b/cards/releases/latest/download/latest.json"
       ]
     }
   }
