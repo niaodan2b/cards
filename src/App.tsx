@@ -16,6 +16,7 @@ import { Progress } from '@/components/ui/progress'
 import { CardList } from '@/components/CardList'
 import { CardDetail } from '@/components/CardDetail'
 import { CreateCardDialog } from '@/components/CreateCardDialog'
+import { AuthDialog } from '@/components/AuthDialog'
 import { useCardList } from '@/hooks/useCards'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { cn } from '@/lib/utils'
@@ -236,6 +237,7 @@ function CardsPage() {
         </main>
       )}
       <CreateCardDialog open={createOpen} onOpenChange={setCreateOpen} onCreated={handleCreated} />
+      <AuthDialog />
 
       <AlertDialog
         open={!!pendingUpdate}

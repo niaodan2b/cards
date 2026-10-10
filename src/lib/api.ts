@@ -1,3 +1,4 @@
+import { fetchWithAuth } from './auth'
 import type {
   Card,
   CreateCardPayload,
@@ -14,7 +15,7 @@ type Envelope<T> = {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
+  const res = await fetchWithAuth(`${BASE}${path}`, {
     headers: { 'Content-Type': 'application/json' },
     ...init,
   })
